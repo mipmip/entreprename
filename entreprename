@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'bundler/setup'
+require 'thor'
+
+class Dictionary
+  attr_writer :dir, :file
+  attr_reader :words
+
+  def initialize file, filename=nil
+    @dir='dictionaries'
+    @file = file
+
+    if filename
+      @path_dictfile = filename
+    else
+      @path_dictfile = File.join(File.expand_path(File.dirname(__FILE__)),@dir,@file)
+    end
+    @words = []
+    read
+  end
+
+  def read
+    File.readlines(@path_dictfile).each do |line|
+      @words << line.chomp
+    end
+  end
+end
+
+class MarketingGirl
+
+  def tender one, two
+    return "#{one}#{two}"
+  end
+
+  def pair one, two
+    return "#{one}#{two}"
+  end
+
+end
+
+class Entrepename < Thor
+
+  option :num, :type => :numeric, :default => 1
+  option :dict
+  desc "pair", "makeup new names like WebWax"
+  def pair
+    mg = MarketingGirl.new
+    main = Dictionary.new 'tech.txt', options[:dict]
+    food = Dictionary.new 'food.txt'
+
+    options[:num].times do
+      print mg.pair main.words.sample, food.words.sample+"\n"
+    end
+  end
+
+  option :num, :type => :numeric, :default => 1
+  option :dict
+  desc "tender", "makeup new names like Httpable"
+  def tender
+
+    mg = MarketingGirl.new
+    main = Dictionary.new 'tech.txt', options[:dict]
+    endings = Dictionary.new 'endings.txt'
+
+    options[:num].times do
+      print mg.tender main.words.sample, endings.words.sample+"\n"
+    end
+  end
+end
+
+Entrepename.start(ARGV)
